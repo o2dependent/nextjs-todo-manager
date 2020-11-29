@@ -1,4 +1,3 @@
-import Todo from '../../../models/Todo';
 import TodoList from '../../../models/TodoList';
 import dbConnect from '../../../utils/dbConnect';
 
@@ -11,7 +10,7 @@ export default async (req, res) => {
 		case 'GET':
 			try {
 				const todoLists = await TodoList.find({});
-				res.status(200).json({ success: true, data: todoLists });
+				res.status(200).json({ success: true, todoLists });
 			} catch (err) {
 				console.error(err);
 				res.status(400).json({ success: false });

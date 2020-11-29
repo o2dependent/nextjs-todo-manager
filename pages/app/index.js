@@ -10,17 +10,9 @@ export default function index({ data }) {
 		<div>
 			{typeof todoLists !== 'undefined' &&
 				todoLists.map((todoList) => (
-					<div key={todoList.id}>
+					<div key={todoList._id}>
 						<h4>{todoList.title}</h4>
-						<ul>
-							{todoList.todos.map((todo) => (
-								<li key={todo.id}>
-									<p>{todo.desc}</p>
-									<button>{todo.completed ? 'X' : 'O'}</button>
-								</li>
-							))}
-						</ul>
-						<Link href={`/app/${todoList.id}`}>
+						<Link href={`/app/${todoList._id}`}>
 							<a>Go to list</a>
 						</Link>
 					</div>

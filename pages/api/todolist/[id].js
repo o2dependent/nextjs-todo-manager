@@ -1,4 +1,5 @@
 import Todo from '../../../models/Todo';
+import TodoList from '../../../models/TodoList';
 import dbConnect from '../../../utils/dbConnect';
 
 dbConnect();
@@ -11,46 +12,55 @@ export default async (req, res) => {
 	} = req;
 	// Find db entry with id
 	switch (method) {
+		// Get todo list and todos inside
 		case 'GET':
 			try {
-				const todo = await Todo.findById(id);
+				await TodoList.findById(id)
+					.populate('todos')
+					.exec((err, todoList) => {
+						if (!todoList || err) {
+							return res.status(400).json({ success: false });
+						}
 
-				if (!todo) {
-					return res.status(400).json({ success: false });
-				}
-
-				res.status(200).json({ success: true, data: todo });
+						res.status(200).json({ success: true, todoList });
+					});
 			} catch (err) {
 				console.error(err);
 				return res.status(400).json({ success: false });
 			}
 			break;
-		case 'PUT':
+		// Edit todo list title
+		case 'POST':
 			try {
-				const todo = await Todo.findByIdAndUpdate(id, req.body, {
-					new: true,
-					runValidators: true,
-				});
+				const newTodo = await Todo.create(JSON.parse(req.body));
+				await TodoList.findById(id)
+					.populate('todos')
+					.exec(async (err, todoList) => {
+						if (!todoList || !newTodo || err) {
+							return res.status(400).json({ success: false });
+						}
 
-				if (!todo) {
-					return res.status(400).json({ success: false });
-				}
-
-				res.status(200).json({ success: true, data: todo });
+						todoList.todos.push(newTodo);
+						await todoList.save();
+						await todoList.populate('todos');
+						res.status(200).json({ success: true, todoList });
+					});
 			} catch (err) {
 				console.error(err);
 				return res.status(400).json({ success: false });
 			}
 			break;
+		// Delete todo list
 		case 'DELETE':
 			try {
-				const deletedTodo = await Todo.deleteOne({ _id: id });
-
-				if (!deletedTodo) {
-					return res.status(400).json({ success: false });
-				}
-
-				res.status(200).json({ success: true, data: {} });
+				await TodoList.deleteOne({ _id: id })
+					.populate('todos')
+					.exec((err, newTodoList) => {
+						if (err || !newTodoList) {
+							res.status(400).json({ success: false });
+						}
+						res.status(200).json({ success: true, data: {} });
+					});
 			} catch (err) {
 				console.error(err);
 				res.status(400).json({ success: false });
