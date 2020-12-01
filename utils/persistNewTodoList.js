@@ -1,5 +1,5 @@
-const persistNewTodo = async (todoListId, data) => {
-	const url = `${process.env.URL}/api/todolist/${todoListId}`;
+const persistNewTodoList = async (data) => {
+	const url = `${process.env.URL}/api/todolist`;
 	const response = await fetch(url, {
 		method: 'POST',
 		headers: {
@@ -10,4 +10,4 @@ const persistNewTodo = async (todoListId, data) => {
 	return response.json();
 };
 
-export default persistNewTodo;
+export default persistNewTodoList;

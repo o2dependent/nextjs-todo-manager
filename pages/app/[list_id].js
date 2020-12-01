@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import deleteOneTodo from '../../utils/deleteOneTodo';
 import persistNewTodo from '../../utils/persistNewTodo';
-import persistToggle from '../../utils/persistToggle';
 import updateTodo from '../../utils/updateTodo';
 
 export default function list_id({ data }) {
@@ -32,14 +31,13 @@ export default function list_id({ data }) {
 		const {
 			todoList: { todos },
 		} = await persistNewTodo(_id, newTodo);
-		console.log(todos);
 		setTodos(todos);
 		setTodoText('');
 	};
 
 	const deleteTodo = async (idx, id) => {
 		try {
-			await deleteOneTodo(id);
+			await deleteOneTodo(id, _id);
 			const newTodos = [...todos];
 			newTodos.splice(idx, 1);
 			setTodos(newTodos);

@@ -15,17 +15,13 @@ export default async (req, res) => {
 		// Edit todo list title
 		case 'PUT':
 			try {
-				await Todo.findOneAndUpdate(
-					{ _id: id },
-					JSON.parse(req.body),
-					(err, todoObj) => {
-						if (err) {
-							console.error(err);
-							return;
-						}
-						res.status(200).json({ success: true, todo: todoObj });
+				await Todo.findOneAndUpdate({ _id: id }, req.body, (err, todoObj) => {
+					if (err) {
+						console.error(err);
+						return;
 					}
-				);
+					res.status(200).json({ success: true, todo: todoObj });
+				});
 			} catch (err) {
 				console.error(err);
 				return res.status(400).json({ success: false });
@@ -34,7 +30,12 @@ export default async (req, res) => {
 		// Delete todo
 		case 'DELETE':
 			try {
+				const todoListId = req.body.todoListId;
 				const deletedTodoList = await Todo.deleteOne({ _id: id });
+				await TodoList.updateOne(
+					{ _id: todoListId },
+					{ $pullAll: { todos: [id] } }
+				);
 
 				if (!deletedTodoList) {
 					return res.status(400).json({ success: false });

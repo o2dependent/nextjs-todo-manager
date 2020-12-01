@@ -21,7 +21,6 @@ export default async (req, res) => {
 						if (!todoList || err) {
 							return res.status(400).json({ success: false });
 						}
-
 						res.status(200).json({ success: true, todoList });
 					});
 			} catch (err) {
@@ -32,7 +31,7 @@ export default async (req, res) => {
 		// Edit todo list title
 		case 'POST':
 			try {
-				const newTodo = await Todo.create(JSON.parse(req.body));
+				const newTodo = await Todo.create(req.body);
 				await TodoList.findById(id)
 					.populate('todos')
 					.exec(async (err, todoList) => {
@@ -53,6 +52,8 @@ export default async (req, res) => {
 		// Delete todo list
 		case 'DELETE':
 			try {
+				const todos = req.body.todos;
+				await Todo.deleteMany({ _id: { $in: todos } });
 				await TodoList.deleteOne({ _id: id })
 					.populate('todos')
 					.exec((err, newTodoList) => {
