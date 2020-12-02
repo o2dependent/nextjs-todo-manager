@@ -1,10 +1,12 @@
 import TodoList from '../../../models/TodoList';
 import dbConnect from '../../../utils/dbConnect';
+import auth0 from '../utils/auth0';
 
 dbConnect();
 
-export default async (req, res) => {
+export default auth0.requireAuthentication(async (req, res) => {
 	const { method } = req;
+	const { user } = await auth0.getSession(req);
 
 	switch (method) {
 		case 'GET':
@@ -30,4 +32,4 @@ export default async (req, res) => {
 			res.status(400);
 			break;
 	}
-};
+});

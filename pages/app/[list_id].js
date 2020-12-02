@@ -1,17 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import deleteOneTodo from '../../utils/deleteOneTodo';
 import persistNewTodo from '../../utils/persistNewTodo';
 import updateTodo from '../../utils/updateTodo';
+import auth0 from '../api/utils/auth0';
 
-export default function list_id({ data }) {
-	const {
-		todoList: { _id, title },
-	} = data;
-
-	const [todos, setTodos] = useState(data.todoList.todos);
+export default function list_id({ user, _id }) {
+	const [loading, setLoading] = useState(true);
+	const [title, setTitle] = useState('');
+	const [todos, setTodos] = useState([]);
 	const [todoText, setTodoText] = useState('');
 	const [editingTodoIdx, setEditingTodoIdx] = useState(null);
 	const [editingTodoText, setEditingTodoText] = useState('');
+
+	useEffect(async () => {
+		// Get user's todo list
+		const res = await fetch(`http://localhost:3000/api/todolist/${_id}`);
+		// Get data
+		const returned = await res.json();
+		// Check if data exists
+		if (!returned) {
+			data = { title: 'No data found' };
+			return;
+		}
+		// Set todos
+		setTodos(returned.todoList.todos);
+		// Set title
+		setTitle(returned.todoList.title);
+		// Set loading
+		setLoading(false);
+	}, []);
 
 	const toggleTodo = (idx) => {
 		const newTodoList = [...todos];
@@ -110,22 +127,21 @@ export default function list_id({ data }) {
 	);
 }
 
-export async function getServerSideProps(ctx) {
-	// Get user's todo lists
-	const res = await fetch(
-		`http://localhost:3000/api/todolist/${ctx.params.list_id}`
-	);
-	const data = await res.json();
-	// Check if data exists
-	if (!data) {
+export async function getServerSideProps({ req, params }) {
+	// Get auth0 session
+	const session = await auth0.getSession(req);
+	if (session?.user) {
+		// Return user's todo lists
 		return {
-			notFound: true,
+			props: {
+				user: session?.user,
+				_id: params.list_id,
+			},
 		};
+	} else {
+		res.setHeader('location', '/register');
+		res.statusCode = 302;
+		res.end();
+		return;
 	}
-	// Return user's todo lists
-	return {
-		props: {
-			data,
-		},
-	};
 }

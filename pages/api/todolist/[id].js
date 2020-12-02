@@ -1,10 +1,11 @@
 import Todo from '../../../models/Todo';
 import TodoList from '../../../models/TodoList';
 import dbConnect from '../../../utils/dbConnect';
+import auth0 from '../utils/auth0';
 
 dbConnect();
 
-export default async (req, res) => {
+export default auth0.requireAuthentication(async (req, res) => {
 	// Get id from query string
 	const {
 		query: { id },
@@ -70,4 +71,4 @@ export default async (req, res) => {
 		default:
 			res.status(400).json({ success: false });
 	}
-};
+});

@@ -1,22 +1,38 @@
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from '../../components/ui/Modal';
 import deleteOneTodoList from '../../utils/deleteOneTodoList';
 import persistNewTodoList from '../../utils/persistNewTodoList';
+import auth0 from '../api/utils/auth0';
 
-export default function index({ data }) {
+export default function index({ user }) {
 	const [newListName, setNewListName] = useState('');
-	const [todoLists, setTodoLists] = useState(data.todoLists);
+	const [todoLists, setTodoLists] = useState([]);
 	const [isNewListOpen, setIsNewListOpen] = useState(false);
+	let data = { todoLists: [], loading: true };
+
+	useEffect(async () => {
+		// Get user's todo lists
+		const res = await fetch('http://localhost:3000/api/todolist');
+		const returned = await res.json();
+		// Check if data exists
+		if (!returned) {
+			data = { todoLists: [], loading: false };
+		}
+		data = { todoLists: returned.todoLists, loading: false };
+		setTodoLists(returned.todoLists);
+	}, []);
 
 	const submitNewTodoList = async (e) => {
 		e.preventDefault();
 		if (!newListName) return;
 		const newList = { title: newListName };
 		const { data } = await persistNewTodoList(newList);
-		setTodoLists([...todoLists, data]);
-		setNewListName('');
-		setIsNewListOpen(false);
+		if (data && !data?.error) {
+			setTodoLists([...todoLists, data]);
+			setNewListName('');
+			setIsNewListOpen(false);
+		}
 	};
 
 	const deleteTodoList = async (idx, id) => {
@@ -62,20 +78,21 @@ export default function index({ data }) {
 	);
 }
 
-export async function getServerSideProps(ctx) {
-	// Get user's todo lists
-	const res = await fetch('http://localhost:3000/api/todolist');
-	const data = await res.json();
-	// Check if data exists
-	if (!data) {
+// TODO : extract out data fetching to client
+export async function getServerSideProps({ res, req }) {
+	// Get auth0 session
+	const session = await auth0.getSession(req);
+	if (session?.user) {
+		// Return user's todo lists
 		return {
-			notFound: true,
+			props: {
+				user: session?.user,
+			},
 		};
+	} else {
+		res.setHeader('location', '/register');
+		res.statusCode = 302;
+		res.end();
+		return;
 	}
-	// Return user's todo lists
-	return {
-		props: {
-			data: data,
-		},
-	};
 }
