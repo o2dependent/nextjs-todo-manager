@@ -1,0 +1,58 @@
+.App__container {
+	display: flex;
+	height: 100vh;
+	width: 100vw;
+	justify-content: flex-start;
+}
+
+.ListDisplay__container {
+	width: 300px;
+	padding: 15px;
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	flex-direction: column;
+	background-color: #20325a;
+}
+.ListDisplay__container * {
+	color: #fefefe;
+}
+
+.List__container {
+	padding: 0 15px;
+	width: 300px;
+	display: flex;
+	justify-content: space-between;
+	cursor: pointer;
+	transition: background-color 250ms;
+}
+.List__container:hover {
+	background-color: #00000032;
+}
+
+.ListDisplay__add_btn {
+	background-color: #00000022;
+	border: none;
+	cursor: pointer;
+	width: 300px;
+	height: 50px;
+	padding: 15px;
+	text-align: left;
+}
+
+.ListDisplay__profile {
+	width: 100%;
+	display: flex;
+	margin-bottom: 15px;
+}
+
+.ListDisplay__profile_picture {
+	width: 100px;
+	height: 100px;
+	margin-right: 15px;
+	border-radius: 5px;
+}
+
+.ListDisplay__profile_logout {
+	font-size: small;
+}

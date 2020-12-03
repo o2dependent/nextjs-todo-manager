@@ -11,7 +11,7 @@ export default auth0.requireAuthentication(async (req, res) => {
 	switch (method) {
 		case 'GET':
 			try {
-				const todoLists = await TodoList.find({});
+				const todoLists = await TodoList.find({ sub: user.sub });
 				res.status(200).json({ success: true, todoLists });
 			} catch (err) {
 				console.error(err);
@@ -20,8 +20,8 @@ export default auth0.requireAuthentication(async (req, res) => {
 			break;
 		case 'POST':
 			try {
-				const todo = await TodoList.create(req.body);
-				res.status(201).json({ success: true, data: todo });
+				const todoList = await TodoList.create(req.body);
+				res.status(201).json({ success: true, data: todoList });
 			} catch (err) {
 				console.error(err);
 				res.status(400).json({ success: false });

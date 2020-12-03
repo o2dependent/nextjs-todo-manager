@@ -1,0 +1,13 @@
+.TodosDisplay__container {
+	padding: 15px;
+	flex-grow: 1;
+	background-color: #2a3d66;
+}
+.TodosDisplay__container * {
+	color: #fefefe;
+}
+.TodosDisplay__container button {
+	border: none;
+	background-color: #20325a;
+	padding: 15px;
+}

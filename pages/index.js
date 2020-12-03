@@ -14,9 +14,6 @@ export default function Home({ user }) {
 				</>
 			) : (
 				<>
-					<Link href='/register'>
-						<a>Register</a>
-					</Link>
 					<a href='/api/login'>Login</a>
 				</>
 			)}

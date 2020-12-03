@@ -1,13 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500&display=swap');
+
 html,
 body {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-
 	padding: 0;
 	margin: 0;
-	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-		Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+	font-family: 'Comfortaa', cursive;
+	background-color: #2a3d66;
 }
 
 a {
@@ -18,6 +16,8 @@ a {
 * {
 	box-sizing: border-box;
 }
+
 input {
+	background-color: #2a3d66;
 	display: block;
 }

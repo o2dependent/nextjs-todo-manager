@@ -2,15 +2,17 @@ import React, { useEffect, useState } from 'react';
 import deleteOneTodo from '../../utils/deleteOneTodo';
 import persistNewTodo from '../../utils/persistNewTodo';
 import updateTodo from '../../utils/updateTodo';
-import auth0 from '../api/utils/auth0';
+import styles from '../../styles/TodosDisplay.module.css';
+import Modal from '../ui/Modal';
 
-export default function list_id({ user, _id }) {
+export default function TodosDisplay({ _id }) {
 	const [loading, setLoading] = useState(true);
 	const [title, setTitle] = useState('');
 	const [todos, setTodos] = useState([]);
 	const [todoText, setTodoText] = useState('');
 	const [editingTodoIdx, setEditingTodoIdx] = useState(null);
 	const [editingTodoText, setEditingTodoText] = useState('');
+	const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
 
 	useEffect(async () => {
 		// Get user's todo list
@@ -28,7 +30,7 @@ export default function list_id({ user, _id }) {
 		setTitle(returned.todoList.title);
 		// Set loading
 		setLoading(false);
-	}, []);
+	}, [_id]);
 
 	const toggleTodo = (idx) => {
 		const newTodoList = [...todos];
@@ -88,60 +90,51 @@ export default function list_id({ user, _id }) {
 	};
 
 	return (
-		<div>
-			<div key={_id}>
-				<h4>{title}</h4>
-				<ul>
-					{todos.map((todo, idx) => (
-						<li key={todo._id}>
-							{editingTodoIdx === idx ? (
-								<form onSubmit={submitTodoEdit}>
-									<input
-										type='text'
-										value={editingTodoText}
-										onChange={(e) => setEditingTodoText(e.target.value)}
-									/>
-									<button type='submit'>Submit changes</button>
-								</form>
-							) : (
-								<p>{todo.desc}</p>
-							)}
-							<button onClick={() => toggleTodo(idx)}>
-								{todo.completed ? 'X' : 'O'}
-							</button>
-							<button onClick={() => deleteTodo(idx, todo._id)}>Delete</button>
-							<button onClick={() => handleEdit(idx)}>Edit</button>
-						</li>
-					))}
-				</ul>
-				<form onSubmit={submitNewTodo}>
-					<input
-						type='text'
-						value={todoText}
-						onChange={(e) => setTodoText(e.target.value)}
-					/>
-					<button type='submit'>Add</button>
-				</form>
-			</div>
+		<div className={styles.TodosDisplay__container} key={_id}>
+			<h4>{title}</h4>
+			<button onClick={() => setIsAddFriendOpen(true)}>
+				Add friend to list
+			</button>
+			{/* // TODO : implement adding friends to list */}
+			{isAddFriendOpen && (
+				<Modal closeModal={() => setIsAddFriendOpen(false)}>
+					<div onClick={() => null}>
+						<h4>User's name</h4>
+						<img src={''} />
+					</div>
+				</Modal>
+			)}
+			<ul>
+				{todos.map((todo, idx) => (
+					<li key={todo._id}>
+						{editingTodoIdx === idx ? (
+							<form onSubmit={submitTodoEdit}>
+								<input
+									type='text'
+									value={editingTodoText}
+									onChange={(e) => setEditingTodoText(e.target.value)}
+								/>
+								<button type='submit'>Submit changes</button>
+							</form>
+						) : (
+							<p>{todo.desc}</p>
+						)}
+						<button onClick={() => toggleTodo(idx)}>
+							{todo.completed ? 'X' : 'O'}
+						</button>
+						<button onClick={() => deleteTodo(idx, todo._id)}>Delete</button>
+						<button onClick={() => handleEdit(idx)}>Edit</button>
+					</li>
+				))}
+			</ul>
+			<form onSubmit={submitNewTodo}>
+				<input
+					type='text'
+					value={todoText}
+					onChange={(e) => setTodoText(e.target.value)}
+				/>
+				<button type='submit'>Add</button>
+			</form>
 		</div>
 	);
-}
-
-export async function getServerSideProps({ req, params }) {
-	// Get auth0 session
-	const session = await auth0.getSession(req);
-	if (session?.user) {
-		// Return user's todo lists
-		return {
-			props: {
-				user: session?.user,
-				_id: params.list_id,
-			},
-		};
-	} else {
-		res.setHeader('location', '/register');
-		res.statusCode = 302;
-		res.end();
-		return;
-	}
 }
