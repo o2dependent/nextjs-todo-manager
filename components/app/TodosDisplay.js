@@ -13,6 +13,7 @@ export default function TodosDisplay({ _id }) {
 	const [editingTodoIdx, setEditingTodoIdx] = useState(null);
 	const [editingTodoText, setEditingTodoText] = useState('');
 	const [isAddFriendOpen, setIsAddFriendOpen] = useState(false);
+	const [friends, setFriends] = useState([]);
 
 	useEffect(async () => {
 		// Get user's todo list
@@ -89,19 +90,47 @@ export default function TodosDisplay({ _id }) {
 		}
 	};
 
+	const getFriendsData = async () => {
+		const res = await fetch('/api/user/friends');
+		const data = await res.json();
+		setFriends(data.friends);
+	};
+
+	const handleAddFriendToList = async (user_id) => {
+		const res = await fetch(`/api/todolist/${_id}`, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ user_id }),
+		});
+		const data = await res.json();
+		console.log({ data });
+	};
+
 	return (
 		<div className={styles.TodosDisplay__container} key={_id}>
 			<h4>{title}</h4>
-			<button onClick={() => setIsAddFriendOpen(true)}>
+			<button
+				onClick={() => {
+					setIsAddFriendOpen(true);
+					getFriendsData();
+				}}
+			>
 				Add friend to list
 			</button>
 			{/* // TODO : implement adding friends to list */}
-			{isAddFriendOpen && (
+			{isAddFriendOpen && friends && (
 				<Modal closeModal={() => setIsAddFriendOpen(false)}>
-					<div onClick={() => null}>
-						<h4>User's name</h4>
-						<img src={''} />
-					</div>
+					{friends.map((friend) => (
+						<div key={friend._id}>
+							<h4>{friend.name}</h4>
+							<img src={friend.picture} alt={`${friend.name} profile photo`} />
+							<button onClick={() => handleAddFriendToList(friend._id)}>
+								Add to list
+							</button>
+						</div>
+					))}
 				</Modal>
 			)}
 			<ul>

@@ -1,5 +1,5 @@
 const persistNewTodo = async (todoListId, data) => {
-	const url = `${process.env.URL}/api/todolist/${todoListId}`;
+	const url = `/api/todolist/${todoListId}`;
 	const response = await fetch(url, {
 		method: 'POST',
 		headers: {

@@ -7,7 +7,7 @@ const TodoListSchema = new Schema({
 		type: [{ type: mongoose.Types.ObjectId, ref: 'Todo' }],
 		required: false,
 	},
-	sub: { type: String, required: true },
+	owners: { type: [{ type: mongoose.Types.ObjectId, ref: 'User' }] },
 });
 
 module.exports =

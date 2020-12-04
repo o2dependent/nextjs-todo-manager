@@ -11,8 +11,6 @@ export default function ListDisplay({ setDisplayListId, displayListId, user }) {
 	const [isNewListOpen, setIsNewListOpen] = useState(false);
 	const [loading, setLoading] = useState(true);
 
-	console.log(user);
-
 	useEffect(async () => {
 		// Get user's todo lists
 		const res = await fetch('/api/todolist');
@@ -29,9 +27,9 @@ export default function ListDisplay({ setDisplayListId, displayListId, user }) {
 	const submitNewTodoList = async (e) => {
 		e.preventDefault();
 		if (!newListName) return;
-		const newList = { title: newListName, sub: user.sub };
+		const newList = { title: newListName };
 		const { data } = await persistNewTodoList(newList);
-		if (data && !data?.error) {
+		if (data) {
 			setTodoLists([...todoLists, data]);
 			setNewListName('');
 			setIsNewListOpen(false);
@@ -62,12 +60,15 @@ export default function ListDisplay({ setDisplayListId, displayListId, user }) {
 				/>
 				<div>
 					<h4>{user.name.split('@')[0]}</h4>
+					<p>
+						{user?.friend_id?.nickname}#{user?.friend_id?.number}
+					</p>
 					<a className={styles.ListDisplay__profile_logout} href='/api/logout'>
 						Logout
 					</a>
 				</div>
 			</div>
-			<SearchUsers />
+			<SearchUsers user={user} />
 			{todoLists.length !== 0 &&
 				todoLists.map((todoList, idx) => (
 					<div
@@ -90,6 +91,7 @@ export default function ListDisplay({ setDisplayListId, displayListId, user }) {
 					</form>
 				</Modal>
 			)}
+			{/* // TODO : set up owners push when adding new lists */}
 			<button
 				className={styles.ListDisplay__add_btn}
 				onClick={() => setIsNewListOpen(true)}

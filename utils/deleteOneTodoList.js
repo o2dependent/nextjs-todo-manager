@@ -1,5 +1,5 @@
 const deleteOneTodoList = async (todoListId, todoIdArray) => {
-	const url = `${process.env.URL}/api/todolist/${todoListId}`;
+	const url = `/api/todolist/${todoListId}`;
 	const response = await fetch(url, {
 		method: 'DELETE',
 		headers: {

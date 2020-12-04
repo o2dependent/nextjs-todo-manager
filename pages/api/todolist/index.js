@@ -1,4 +1,5 @@
 import TodoList from '../../../models/TodoList';
+import User from '../../../models/User';
 import dbConnect from '../../../utils/dbConnect';
 import auth0 from '../utils/auth0';
 
@@ -11,7 +12,13 @@ export default auth0.requireAuthentication(async (req, res) => {
 	switch (method) {
 		case 'GET':
 			try {
-				const todoLists = await TodoList.find({ sub: user.sub });
+				const reqUser = await User.findOne({ sub: user.sub });
+				if (!reqUser) {
+					return req
+						.status(400)
+						.json({ success: false, message: 'Requesting user not found' });
+				}
+				const todoLists = await TodoList.find({ owners: reqUser._id });
 				res.status(200).json({ success: true, todoLists });
 			} catch (err) {
 				console.error(err);
@@ -20,7 +27,15 @@ export default auth0.requireAuthentication(async (req, res) => {
 			break;
 		case 'POST':
 			try {
-				const todoList = await TodoList.create(req.body);
+				const reqUser = await User.findOne({ sub: user.sub });
+				if (!reqUser) {
+					return req
+						.status(400)
+						.json({ success: false, message: 'Requesting user not found' });
+				}
+				const todoList = await TodoList.create({ title: req.body.title });
+				todoList.owners.push(reqUser);
+				todoList.save();
 				res.status(201).json({ success: true, data: todoList });
 			} catch (err) {
 				console.error(err);

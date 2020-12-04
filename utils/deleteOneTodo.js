@@ -1,5 +1,5 @@
 const deleteOneTodo = async (todoId, todoListId) => {
-	const url = `${process.env.URL}/api/todo/${todoId}`;
+	const url = `/api/todo/${todoId}`;
 	const data = { todoListId };
 	const response = await fetch(url, {
 		method: 'DELETE',

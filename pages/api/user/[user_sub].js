@@ -29,27 +29,7 @@ export default auth0.requireAuthentication(async (req, res) => {
 				return res.status(400).json({ success: false });
 			}
 			break;
-		// Edit todo list title
-		case 'PUT':
-			try {
-				if (user.sub === user_sub) {
-					return res.status(400).json({ success: false });
-				}
-				const reqUser = await User.findOne({ sub: user.sub });
-				const foundUser = await User.findOne({ sub: user_sub });
-				if (!foundUser || !reqUser) {
-					return res.status(400).json({ success: false });
-				}
-				reqUser.friends.push({ sub: user_sub });
-				foundUser.friends.push({ sub: user.sub });
-				await foundUser.save();
-				await reqUser.save();
-				res.status(200).json({ success: true, foundUser });
-			} catch (err) {
-				console.error(err);
-				return res.status(400).json({ success: false });
-			}
-			break;
+
 		default:
 			res.status(400).json({ success: false });
 	}

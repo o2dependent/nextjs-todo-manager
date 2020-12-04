@@ -1,5 +1,6 @@
 import Todo from '../../../models/Todo';
 import TodoList from '../../../models/TodoList';
+import User from '../../../models/User';
 import dbConnect from '../../../utils/dbConnect';
 import auth0 from '../utils/auth0';
 
@@ -29,7 +30,33 @@ export default auth0.requireAuthentication(async (req, res) => {
 				return res.status(400).json({ success: false });
 			}
 			break;
-		// Edit todo list title
+		// Add new friend to todo list
+		case 'PUT':
+			try {
+				const foundUser = await User.findById(req.body.user_id);
+				const foundList = await TodoList.findById(id);
+				if (!foundUser || !foundList) {
+					return res
+						.status(400)
+						.json({ success: false, message: 'Resource not found' });
+				}
+				if (
+					foundList?.owners?.some(
+						(owner) => String(owner) === String(req.body.user_id)
+					)
+				) {
+					return res
+						.status(400)
+						.json({ success: false, message: 'User already added' });
+				}
+				foundList.owners.push(foundUser);
+				foundList.save();
+				res.status(201).json({ success: true, foundList });
+			} catch (err) {
+				console.error(err);
+			}
+			break;
+		// Add new todo
 		case 'POST':
 			try {
 				const newTodo = await Todo.create(req.body);
@@ -39,7 +66,6 @@ export default auth0.requireAuthentication(async (req, res) => {
 						if (!todoList || !newTodo || err) {
 							return res.status(400).json({ success: false });
 						}
-
 						todoList.todos.push(newTodo);
 						await todoList.save();
 						await todoList.populate('todos');

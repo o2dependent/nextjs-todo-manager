@@ -5,11 +5,12 @@ import styles from '../../styles/ListDisplay.module.css';
 
 import auth0 from '../api/utils/auth0';
 
-export default function index({ user }) {
+export default function index(props) {
 	const [displayListId, setDisplayListId] = useState('');
+	const [user, setUser] = useState(props.user);
 
 	useEffect(async () => {
-		const data = await fetch('/api/user', {
+		const res = await fetch('/api/user', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -18,8 +19,14 @@ export default function index({ user }) {
 				sub: user.sub,
 				name: user.name,
 				picture: user.picture,
+				friend_id: {
+					nickname: user.nickname,
+					number: Number(user.sub.slice(-4)),
+				},
 			}),
 		});
+		const userData = await res.json();
+		setUser({ ...user, ...userData.userExists });
 	}, []);
 
 	return (
