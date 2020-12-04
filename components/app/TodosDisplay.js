@@ -17,7 +17,7 @@ export default function TodosDisplay({ _id }) {
 
 	useEffect(async () => {
 		// Get user's todo list
-		const res = await fetch(`http://localhost:3000/api/todolist/${_id}`);
+		const res = await fetch(`/api/todolist/${_id}`);
 		// Get data
 		const returned = await res.json();
 		// Check if data exists
